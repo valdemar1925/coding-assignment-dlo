@@ -2,8 +2,9 @@ import hashlib
 import hmac
 import os
 import uuid
+
 from datetime import datetime
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request, Response
 from urllib.parse import quote
 from dotenv import load_dotenv
 
@@ -75,9 +76,12 @@ def delegatedlogon():
     Handle delegated logon request and redirect to the Minddistrict platform.
     
     Returns:
-        Response: Redirects to the generated URL for delegated logon.
+        Response: Redirects to the generated URL for delegated logon or a 403 error if usertype is invalid.
     """
     usertype = request.args.get('usertype', app.config.get('CAREPROVIDER_USERTYPE_NAME'))
+    if usertype not in {app.config.get('CAREPROVIDER_USERTYPE_NAME'), app.config.get('CLIENT_USERTYPE_NAME')}:
+        return Response("Given usertype isn't valid.", status=403)
+
     userid = get_user_id(usertype)
     sub_path = get_sub_path(usertype)
     nonce = uuid.uuid4()  # random (unique with each request) uuid for making url unique
