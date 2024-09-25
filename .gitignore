@@ -1,0 +1,3 @@
+# Environments and Byte-compiled / optimized / DLL files
+venv
+.env
